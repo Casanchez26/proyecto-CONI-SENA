@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CONI</title>
+    <link rel="stylesheet" href="estilo-generar-informe.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+
+<body>
+
+    <section class="encabezado">
+        <img src="img/ESLOGAN CONI.png" alt="Eslogan de CONI - Gestión de inventario" class="imagen-encabezado">
+        <div class="barra-superior">
+            <nav>
+                <ul>
+                    <li><a href="perfil-usuario.html">Perfil Usuario</a></li>
+                    <li><a href="generar-informe.html">Generar informe</a></li>
+                    <li></i><a href="perfil-usuario.html" class="volver-atras">Volver atrás</a></li>
+                </ul>
+            </nav>
+        </div>
+    </section>
+
+    <main>
+
+        <section class="botones-reporte">
+            <button onclick="exportarPDF()">Exportar a PDF</button>
+            <button onclick="exportarExcel()">Exportar a Excel</button>
+        </section>
+
+        <select class="campoFiltro" id="campoFiltro">
+            <option value="">-- Filtrar por --</option>
+            <option value="CLASE">CLASE</option>
+            <option value="MARCA">MARCA</option>
+            <option value="RAM">RAM</option>
+            <option value="DISCO DURO">DISCO DURO</option>
+            <option value="PROCESADOR">PROCESADOR</option>
+        </select>
+
+        <select class="valorFiltro" id="valorFiltro" disabled>
+            <option value="">-- Selecciona valor --</option>
+        </select>
+
+        <table class="tabla" id="data-table">
+            <thead>
+                <tr class="encabezado-inventario">
+                    <th>N°INVENTARIO</th>
+                    <th>N°SERIE</th>
+                    <th>CLASE</th>
+                    <th>MARCA</th>
+                    <th>RAM</th>
+                    <th>DISCO DURO</th>
+                    <th>PROCESADOR</th>
+                </tr>
+            </thead>
+            <tbody class="fila"></tbody>            
+        </table>
+
+        <script>
+            const campoFiltro = document.getElementById("campoFiltro");
+            const valorFiltro = document.getElementById("valorFiltro");
+            const tbody = document.querySelector("#data-table tbody");
+
+            // Cargar los datos al iniciar
+            document.addEventListener("DOMContentLoaded", cargarExcel);
+
+            // Cargar y procesar datos desde Excel
+            async function cargarExcel() {
+                const url = "data/BD equipos perifericos CONI.xlsx"
+                const response = await fetch(url);
+                const arrayBuffer = await response.arrayBuffer();
+                const workbook = XLSX.read(arrayBuffer, { type: "array" });
+
+                const hoja = workbook.Sheets[workbook.SheetNames[0]];
+                const datos = XLSX.utils.sheet_to_json(hoja);
+
+                const filterSelect = document.getElementById("filter");
+                const tbody = document.querySelector("#data-table tbody");
+
+                datos.forEach(d => {
+                    // Generar fila para la tabla
+                    const fila =
+                        `<tr>
+                        <td>${d["N°INVENTARIO"]}</td>
+                        <td>${d["N°SERIE"]}</td>
+                        <td>${d.CLASE}</td>
+                        <td>${d.MARCA}</td>
+                        <td>${d.RAM}</td>
+                        <td>${d["DISCO DURO"]}</td>
+                        <td>${d.PROCESADOR}</td>
+                    </tr>`;
+                    tbody.innerHTML += fila;
+                });
+
+                // Llenar tabla al inicio
+                function mostrarDatos(filtrados = datos) {
+                    tbody.innerHTML = "";
+                    filtrados.forEach(d => {
+                        const fila =
+                            `<tr>
+                        <td>${d["N°INVENTARIO"]}</td>
+                        <td>${d["N°SERIE"]}</td>
+                        <td>${d["CLASE"]}</td>
+                        <td>${d["MARCA"]}</td>
+                        <td>${d["RAM"]}</td>
+                        <td>${d["DISCO DURO"]}</td>
+                        <td>${d["PROCESADOR"]}</td>
+                    </tr>`;
+                        tbody.innerHTML += fila;
+                    });
+                }
+
+                // Paso 1: Cuando seleccionas el tipo de filtro (campo)
+                campoFiltro.addEventListener("change", () => {
+                    const campo = campoFiltro.value;
+                    valorFiltro.innerHTML = `<option value="">-- Selecciona valor --</option>`;
+
+                    if (campo) {
+                        valorFiltro.disabled = false;
+
+                        // Obtener valores únicos del campo seleccionado
+                        const opciones = [...new Set(datos.map(d => d[campo]))].sort();
+
+                        opciones.forEach(valor => {
+                            const option = document.createElement("option");
+                            option.value = valor;
+                            option.textContent = valor;
+                            valorFiltro.appendChild(option);
+                        });
+                    }
+                    else {
+                        valorFiltro.disabled = true;
+                    }
+                });
+
+                // Paso 2: Cuando seleccionas el valor del filtro
+                valorFiltro.addEventListener("change", () => {
+                    const campo = campoFiltro.value;
+                    const valor = valorFiltro.value;
+
+                    if (campo && valor) {
+                        const filtrados = datos.filter(d => d[campo] === valor);
+                        mostrarDatos(filtrados);
+                    } else {
+                        mostrarDatos();
+                    }
+                });
+
+            }
+
+        </script>
+    </main>
+
+
+
+    <script>
+
+        function exportarPDF() {
+            const tabla = document.getElementById("data-table");
+            const opt = {
+                margin: 0.5,
+                filename: 'Reporte ' + new Date().toISOString().split("T")[0] + '.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'landscape' }
+            };
+
+            html2pdf().set(opt).from(tabla).save();
+        }
+
+
+        // Lógica para exportar a Excel
+        function exportarExcel() {
+            const table = document.getElementById("data-table");
+            const wb = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
+            const fecha = new Date().toISOString().split("T")[0];
+            const nombreArchivo = `Reporte_${fecha}.xlsx`;
+            XLSX.writeFile(wb, nombreArchivo);
+        }
+    </script>
+
+</body>
+
+</html>

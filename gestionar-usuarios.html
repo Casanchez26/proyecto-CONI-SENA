@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CONI</title>
+    <link rel="stylesheet" href="estilo-gestion-usuarios.css">
+</head>
+
+<body>
+    <section class="encabezado">
+        <img src="img/ESLOGAN CONI.png" alt="Eslogan de CONI - Gestión de inventario" class="imagen-encabezado">
+        <div class="barra-superior">
+            <nav>
+                <ul>
+                    <li><a href="perfil-admin.html">Perfil Administrador</a></li>
+                    <li><a href="gestionar-usuarios.html">Gestión usuarios</a></li>
+                    <li><a href="perfil-admin.html" class="volver-atras">Volver atrás</a></li>
+                </ul>
+            </nav>
+        </div>
+    </section>
+
+    <header>
+        <div class="container botones-principales">
+            <button class="nuevo-usuario" type="button" onclick="nuevoUsuario()" id="nuevoUsuario">Nuevo
+                empleado</button>
+            <button class="actualizar-usuario" type="button" onclick="actualizarUsuario()"
+                id="actualizarUsuario">Modificar empleado</button>
+        </div>
+    </header>
+
+    <main>
+        <div class="container gestion-empleado">
+
+            <div class="nuevo-empleado" id="nuevoEmpleado" style="display: none;">
+                <h2>Crear usuario</h2>
+                <form id="crear-usuario">
+
+                    <label for="crearNombre">Nombre y apellidos:</label>
+                    <input type="text" id="crearNombre" name="crearNombre"
+                        placeholder="ingrese el nombre y apellidos" required><br>
+
+                    <label for="crearCedula">Cédula:</label>
+                    <input type="number" id="crearCedula" name="crearCedula" placeholder="ingrese N° cédula " required><br>
+
+                    <label for="crearUsuario">Usuario:</label>
+                    <input type="text" id="crearUsuario" name="crearUsuario" placeholder="ingrese el usuario" required><br>
+
+                    <label for="crearEmail">Correo electrónico:</label>
+                    <input type="email" id="crearEmail" name="crearEmail" placeholder="ingrese el e-mail" required><br>
+
+                    <label for="crearPassword">Contraseña:</label>
+                    <input type="password" id="crearPassword" name="crearPassword"
+                        placeholder="ingrese una contraseña" required><br>
+
+                    <button type="button" onclick="usuarioNuevo()">Crear usuario</button>
+                </form>
+
+            </div>
+
+            <div class="modificar-empleado" id="modUsuario" style="display: none;">
+                <h2>Modificar empleado</h2>
+                <form>
+                    <label for="nuevoNombre">Nombre y apellidos:</label>
+                    <input type="text" id="nuevoNombre" name="nuevoNombre"
+                        placeholder="ingrese el nombre y apellidos" required><br>
+
+                    <label for="nuevaCedula">Cédula:</label>
+                    <input type="number" id="nuevaCedula" name="nuevaCedula" placeholder="ingrese N° cédula" required><br>
+
+                    <label for="nuevoEmail">Correo electrónico:</label>
+                    <input type="email" id="nuevoEmail" name="nuevoEmail" placeholder="ingrese el e-mail" required><br>
+
+                    <label for="nuevoPassword">Contraseña:</label>
+                    <input type="string" id="nuevoPassword" name="nuevoPassword"
+                        placeholder="ingrese una contraseña" required><br>
+
+                    <button type="button" onclick="modificarUsuario()">Modificar usuario</button>
+                </form>
+
+            </div>
+        </div>
+    </main>
+    <script>
+        function nuevoUsuario() {
+            document.querySelector("header").style.display = "none";
+            document.getElementById("nuevoEmpleado").style.display = "block";
+            document.getElementById("modUsuario").style.display = "none";
+        }
+
+        function actualizarUsuario() {
+            document.querySelector("header").style.display = "none";
+            document.getElementById("nuevoEmpleado").style.display = "none";
+            document.getElementById("modUsuario").style.display = "block";
+        }
+
+        function usuarioNuevo() {
+            const nombre = document.getElementById('crearNombre').value;
+            const cedula = document.getElementById('crearCedula').value;
+            const usuario = document.getElementById('crearUsuario').value;
+            const email = document.getElementById('crearEmail').value;
+            const password = document.getElementById('crearPassword').value;
+            
+            if (!nombre || !cedula || !usuario || !email || !password) {
+                        alert("Por favor, completa todos los campos.");
+                        return;
+                    }
+            
+            alert(`Usuario creado exitosamente:
+            Nombre: ${nombre}
+            Cédula: ${cedula}
+            Correo: ${email}
+            Usuario: ${usuario}`);
+
+            // Volver a vista principal
+            document.querySelector("header").style.display = "block";
+            document.getElementById("nuevoEmpleado").style.display = "none";
+            document.getElementById("modUsuario").style.display = "none"
+        }
+
+        function modificarUsuario() {
+            const nombre = document.getElementById('nuevoNombre').value;
+            const cedula = document.getElementById('nuevaCedula').value;
+            const email = document.getElementById('nuevoEmail').value;
+            const password = document.getElementById('nuevoPassword').value;
+
+            if (!nombre || !cedula || !email || !password) {
+                        alert("Por favor, completa todos los campos.");
+                        return;
+                    }
+
+            alert(`Usuario modificado exitosamente:
+            Nombre: ${nombre}
+            Cédula: ${cedula}
+            Correo: ${email}`);
+
+            // Volver a vista principal
+            document.querySelector("header").style.display = "block";
+            document.getElementById("nuevoEmpleado").style.display = "none";
+            document.getElementById("modUsuario").style.display = "none"
+        }
+    </script>
+</body>
+
+</html>

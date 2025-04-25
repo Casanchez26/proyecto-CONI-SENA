@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CONI</title>
+    <link rel="stylesheet" href="estilo-compras.css">
+</head>
+
+<body>
+    <section class="encabezado">
+        <img src="img/ESLOGAN CONI.png" alt="Eslogan de CONI - Gestión de inventario" class="imagen-encabezado">
+        <div class="barra-superior">
+            <nav>
+                <ul>
+                    <li><a href="perfil-usuario.html">Perfil Usuario</a></li>
+                    <li><a href="compras.html">Compras</a></li>
+                    <li><a href="perfil-usuario.html" class="volver-atras">Volver atrás</a></li>
+                </ul>
+            </nav>
+        </div>
+    </section>
+
+    <div class="container-textos">
+        <p>
+            Para realizar la solicitud, por favor complete todos los datos requeridos sobre el equipo o
+            periférico necesario.
+        </p>
+    </div>
+
+    <main>
+        <div class="container desplegable-compras">
+            <form id="formularioCompras">
+                <div class="seleccion">
+                    <label for="solicitudCompras">Selecciona tipo</label>
+                </div>
+                <select name="compras" id="solicitudCompras">
+                    <option value="">---Seleccione una opción---</option>
+                    <option value="Equipos (computador, portatil, tablet)">Equipos (computador, portatil, tablet)
+                    </option>
+                    <option value="perifericos">Periféricos (mouse, teclados y cableado)</option>
+                </select>
+                <button type="button" id="enviarSolicitud"> Enviar solicitud</button>
+            </form>
+
+            <div class="container descripcion">
+                <textarea name="descripcion" id="texto-descripcion"
+                    placeholder="Describa el producto a solicitar"></textarea>
+            </div>
+            <div class="checkbox">
+                <label><input type="checkbox" id="prioridad" value="prioridad" /> Alta prioridad</label><br />
+            </div>
+        </div>
+
+    </main>
+    <script>
+
+        document.getElementById("enviarSolicitud").addEventListener("click", function () {
+            const seleccion = document.getElementById('solicitudCompras').value;
+
+            if (seleccion === "") {
+                alert("Por favor, seleccione una opción antes de enviar la solicitud.");
+                return;
+            } else {
+                alert(`Solicitud enviada con exito:
+                 tipo de equipo solicitado: 
+                 ${seleccion}`);
+                    }
+                });
+            </script>
+
+</body>
+
+</html>

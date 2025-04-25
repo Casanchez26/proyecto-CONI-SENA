@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CONI</title>
+    <link rel="stylesheet" href="estilo-equipos-perifericos.css">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+
+<body>
+    <section class="encabezado">
+        <img src="img/ESLOGAN CONI.png" alt="Eslogan de CONI - Gestión de inventario" class="imagen-encabezado">
+        <div class="barra-superior">
+            <nav>
+                <ul>
+                    <li><a href="perfil-usuario.html">Perfil Usuario</a></li>
+                    <li><a href="gestionar-equipo-perifericos.html">Equipos/Perifericos</a></li>
+                    <li><a href="perfil-usuario.html" class="volver-atras">Volver atrás</a></li>
+                </ul>
+            </nav>
+        </div>
+    </section>
+
+    <main>
+
+        <!-- Filtro de estado -->
+        <select class="campoFiltro" id="estadoFiltro">
+            <option value="">-- Selecciona estado --</option>
+            <option value="DISPONIBLE">Verificar equipos disponibles</option>
+            <option value="PDTE ENTREGA">Solicitudes pendientes</option>
+            <option value="ASIGNADO">Equipos asignados</option>
+            <option value="DEVOLUCION">Devoluciones</option>
+            <option value="REGISTRAR">Registrar nuevo equipo</option>
+        </select>
+
+        <table class="tabla" id="data-table">
+            <thead>
+                <tr>
+                    <th>N°INVENTARIO</th>
+                    <th>N°SERIE</th>
+                    <th>CLASE</th>
+                    <th>MARCA</th>
+                    <th>RAM</th>
+                    <th>DISCO DURO</th>
+                    <th>PROCESADOR</th>
+                    <th>ESTADO</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+        <!-- Formulario para registrar -->
+        <div class="registrarEquipo" id="formRegistro" style="display: none; margin-top: 1rem;">
+            <h2>Registrar nuevo equipo</h2>
+            <div class="form-list">
+                <div class="form-group">
+                    <label for="nInventario">N°Inventario</label>
+                    <input id="nInventario" placeholder="N° Inventario" required />
+                </div>
+                <div class="form-group">
+                    <label for="nSerie">N°Serie</label>
+                    <input id="nSerie" placeholder="N° Serie" required />
+                </div>
+                <div class="form-group">
+                    <label for="clase">Clase</label>
+                    <input id="clase" placeholder="Clase" required />
+                </div>
+                <div class="form-group">
+                    <label for="marca">Marca</label>
+                    <input id="marca" placeholder="Marca" required />
+                </div>
+                <div class="form-group">
+                    <label for="ram">RAM</label>
+                    <input id="ram" placeholder="RAM" required />
+                </div>
+                <div class="form-group">
+                    <label for="disco">Disco Duro</label>
+                    <input id="disco" placeholder="Disco Duro" required />
+                </div>
+                <div class="form-group">
+                    <label for="procesador">Procesador</label>
+                    <input id="procesador" placeholder="Procesador" required />
+                </div>
+            </div>
+            <button onclick="registrarEquipo()">Guardar equipo</button>
+        </div>
+    </main>
+
+    <script>
+        // Cargar los datos al iniciar
+        let datos = [];
+
+        const estadoFiltro = document.getElementById("estadoFiltro");
+        const tbody = document.querySelector("#data-table tbody");
+        const formRegistro = document.getElementById("formRegistro");
+        const filterSelect = document.getElementById("estadoFiltro");
+
+        // Llenar tabla al inicio
+        function mostrarDatos(filtrados = datos) {
+            tbody.innerHTML = "";
+            filtrados.forEach(d => {
+                const fila =
+                    `<tr>
+                        <td>${d["N°INVENTARIO"]}</td>
+                        <td>${d["N°SERIE"]}</td>
+                        <td>${d["CLASE"]}</td>
+                        <td>${d["MARCA"]}</td>
+                        <td>${d["RAM"]}</td>
+                        <td>${d["DISCO DURO"]}</td>
+                        <td>${d["PROCESADOR"]}</td>
+                        <td>${d["ESTADO"]}</td>
+                    </tr>`;
+                tbody.innerHTML += fila;
+            });
+        }
+
+        // Cargar y procesar datos desde Excel
+        async function cargarExcel() {
+            const url = "data/BD equipos perifericos CONI.xlsx"
+            const response = await fetch(url);
+            const arrayBuffer = await response.arrayBuffer();
+            const workbook = XLSX.read(arrayBuffer, { type: "array" });
+
+            const hoja = workbook.Sheets[workbook.SheetNames[0]];
+            datos = XLSX.utils.sheet_to_json(hoja);
+            mostrarDatos();
+        }
+
+        estadoFiltro.addEventListener("change", () => {
+            const estado = estadoFiltro.value;
+            formRegistro.style.display = "none";
+
+            if (estado === "REGISTRAR") {
+                formRegistro.style.display = "block";
+                tbody.innerHTML = ""; // ocultamos tabla para registrar
+                return;
+            }
+
+            const filtrados = datos.filter(e => e.ESTADO === estado);
+            mostrarDatos(filtrados);
+        });
+
+        // Para registrar un equipo
+        function registrarEquipo() {
+            const nuevo = {
+                "N°INVENTARIO": document.getElementById("nInventario").value,
+                "N°SERIE": document.getElementById("nSerie").value,
+                "CLASE": document.getElementById("clase").value,
+                "MARCA": document.getElementById("marca").value,
+                "RAM": document.getElementById("ram").value,
+                "DISCO DURO": document.getElementById("disco").value,
+                "PROCESADOR": document.getElementById("procesador").value,
+                "ESTADO": "DISPONIBLE"
+            };
+
+            datos.push(nuevo);
+            alert("Equipo registrado como DISPONIBLE.");
+            estadoFiltro.value = "DISPONIBLE";
+            estadoFiltro.dispatchEvent(new Event("change"));
+        }
+
+        document.addEventListener("DOMContentLoaded", cargarExcel)
+    </script>
+
+    <script>
+        const filtroEstado = document.getElementById("estadoFiltro");
+        const tabla = document.getElementById("data-table");
+
+        filtroEstado.addEventListener("change", () => {
+            const valorSeleccionado = filtroEstado.value;
+
+            if (valorSeleccionado === "REGISTRAR") {
+                tabla.style.display = "none";
+                formRegistro.style.display = "block";
+            } else {
+                tabla.style.display = "table";
+                formRegistro.style.display = "none";
+            }
+        });
+    </script>
+</body>
+
+</html>
